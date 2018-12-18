@@ -19,4 +19,4 @@ nbbuild/
 dist/
 nbdist/
 nbactions.xml
-nb-configuration.xml
+nb-configuration.xmlcheckstyle.xml
