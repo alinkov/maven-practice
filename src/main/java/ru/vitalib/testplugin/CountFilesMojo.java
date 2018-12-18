@@ -24,7 +24,7 @@ public class CountFilesMojo extends AbstractMojo {
      * or relative path starting with directory name inside of root project folder
      * (directory of pom.xml)
      */
-    @Parameter(defaultValue = "${basedir}/src/main")
+    @Parameter(defaultValue = "${basedir}")
     private File rootDirectory;
 
     /**
@@ -81,18 +81,19 @@ public class CountFilesMojo extends AbstractMojo {
         while (dirsQueue.size() > 0 && depth <= requiredDepth) {
             Pair pair = dirsQueue.poll();
             File currentDir = pair.file;
+            if (!currentDir.canRead()) {
+                getLog().info(currentDir + " Permission denied");
+                continue;
+            }
             depth = pair.depth++;
             int counter = 0;
-            try {
-                for (File file : currentDir.listFiles()) {
-                        if (file.isFile()) {
-                            counter++;
-                        } else if (file.isDirectory()) {
-                            dirsQueue.add(new Pair(file, depth));
-                        }
-                    }
-            } catch (NullPointerException e) {
-                getLog().error(e);
+//            System.out.println("Before for " + currentDir + "is Dir: " + currentDir.isDirectory());
+            for (File file : currentDir.listFiles()) {
+                if (file.isFile()) {
+                    counter++;
+                } else if (file.isDirectory()) {
+                    dirsQueue.add(new Pair(file, depth));
+                }
             }
             if (counter < minNumberOfFiles) {
                 quauntityOfFilesInDirectories.put(currentDir, counter);
