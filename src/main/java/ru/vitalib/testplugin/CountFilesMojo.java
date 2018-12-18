@@ -73,12 +73,12 @@ public class CountFilesMojo extends AbstractMojo {
         }
         int counter = 0;
         for (File file : directory.listFiles()) {
+            if (!file.canRead()) {
+                getLog().info(file + " Permission denied");
+                continue;
+            }
             if (file.isFile()) {
                 counter++;
-                if (!file.canRead()) {
-                    getLog().info(file + " Permission denied");
-                    continue;
-                }
             } else if (file.isDirectory()) {
                 countFilesInDirectory(file, requiredDepth - 1);
             }
