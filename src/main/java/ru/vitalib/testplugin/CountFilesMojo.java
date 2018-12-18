@@ -8,9 +8,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 /**
  * Count number of files in directory (default value = "${basedir}/src/main) and
@@ -24,30 +22,31 @@ public class CountFilesMojo extends AbstractMojo {
      * or relative path starting with directory name inside of root project folder
      * (directory of pom.xml)
      */
-    @Parameter(defaultValue = "${basedir}")
+    @Parameter(defaultValue = "${basedir}", property = "dir")
     private File rootDirectory;
 
     /**
      * Minimum number of files permitted for directory
      */
-    @Parameter(defaultValue = "1")
+    @Parameter(defaultValue = "1", property = "files")
     private Integer minNumberOfFiles;
 
 
     /**
      * Depth of search in directory tree
      */
-    @Parameter(defaultValue = "1")
+    @Parameter(defaultValue = "1", property = "depth")
     private Integer depthOfSearch;
 
 
+    private Map<File, Integer> numberOfFilesInDirectories = new HashMap<>();
+
     public void execute() throws MojoExecutionException {
         validateInput();
-        getLog().info("Files directory: " + rootDirectory);
-        Map<File, Integer> numberOfFilesInDirectories = countFilesInDirectory(
-                rootDirectory,
-                depthOfSearch
-        );
+        getLog().info("Serach in directory: " + rootDirectory);
+        getLog().info("Depth of search " + depthOfSearch);
+        getLog().info("Minimal quantity of files: " + minNumberOfFiles);
+        countFilesInDirectory(rootDirectory, depthOfSearch);
         if (numberOfFilesInDirectories.size() != 0) {
             getLog().info(
         "The following directories has less then "
@@ -64,42 +63,29 @@ public class CountFilesMojo extends AbstractMojo {
         }
     }
 
-    class Pair {
-        File file;
-        Integer depth;
-        Pair(File file, Integer depth) {
-            this.file = file;
-            this.depth = depth;
+    void countFilesInDirectory(File directory, int requiredDepth) {
+        if (requiredDepth < 1) {
+            return;
         }
-    }
-
-    private Map<File, Integer> countFilesInDirectory(File testsDirectory, int requiredDepth) {
-        Queue<Pair> dirsQueue = new LinkedList<>();
-        int depth = 1;
-        dirsQueue.add(new Pair(testsDirectory, depth));
-        Map<File, Integer> quauntityOfFilesInDirectories = new HashMap<>();
-        while (dirsQueue.size() > 0 && depth <= requiredDepth) {
-            Pair pair = dirsQueue.poll();
-            File currentDir = pair.file;
-            if (!currentDir.canRead()) {
-                getLog().info(currentDir + " Permission denied");
-                continue;
-            }
-            depth = pair.depth++;
-            int counter = 0;
-//            System.out.println("Before for " + currentDir + "is Dir: " + currentDir.isDirectory());
-            for (File file : currentDir.listFiles()) {
-                if (file.isFile()) {
-                    counter++;
-                } else if (file.isDirectory()) {
-                    dirsQueue.add(new Pair(file, depth));
+        if (!directory.canRead()) {
+            getLog().info(directory + " Permission denied");
+            return;
+        }
+        int counter = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile()) {
+                counter++;
+                if (!file.canRead()) {
+                    getLog().info(file + " Permission denied");
+                    continue;
                 }
-            }
-            if (counter < minNumberOfFiles) {
-                quauntityOfFilesInDirectories.put(currentDir, counter);
+            } else if (file.isDirectory()) {
+                countFilesInDirectory(file, requiredDepth - 1);
             }
         }
-        return quauntityOfFilesInDirectories;
+        if (counter < minNumberOfFiles) {
+            numberOfFilesInDirectories.put(directory, counter);
+        }
     }
 
     void validateInput() throws MojoExecutionException {
