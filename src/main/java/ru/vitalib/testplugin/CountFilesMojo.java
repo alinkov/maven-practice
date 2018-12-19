@@ -22,20 +22,20 @@ public class CountFilesMojo extends AbstractMojo {
      * or relative path starting with directory name inside of root project folder
      * (directory of pom.xml)
      */
-    @Parameter(defaultValue = "${basedir}", property = "dir")
+    @Parameter(defaultValue = "${basedir}", property = "rootDirectory")
     private File rootDirectory;
 
     /**
      * Minimum number of files permitted for directory
      */
-    @Parameter(defaultValue = "1", property = "files")
+    @Parameter(defaultValue = "1", property = "minNumberOfFiles")
     private Integer minNumberOfFiles;
 
 
     /**
      * Depth of search in directory tree
      */
-    @Parameter(defaultValue = "1", property = "depth")
+    @Parameter(defaultValue = "1", property = "depthOfSearch")
     private Integer depthOfSearch;
 
 
@@ -89,8 +89,11 @@ public class CountFilesMojo extends AbstractMojo {
     }
 
     void validateInput() throws MojoExecutionException {
-        if (!rootDirectory.exists()) {
-            throw new MojoExecutionException(rootDirectory + " doesn't exists.");
+        if (!rootDirectory.canRead()) {
+            throw new MojoExecutionException(rootDirectory + " Permission denied");
+        }
+        if (!rootDirectory.isDirectory()) {
+            throw new MojoExecutionException(rootDirectory + " is not a directory.");
         }
         if (minNumberOfFiles < 1) {
             throw new MojoExecutionException("Number of files should be more then 0");
