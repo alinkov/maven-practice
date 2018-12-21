@@ -1,4 +1,4 @@
-package ru.hh.school.plugins.file_size_control_plugin;
+package ru.hh.school.plugins.filesizecontrol;
 
 /*
  * Copyright 2001-2005 The Apache Software Foundation.
@@ -26,7 +26,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -50,6 +49,32 @@ public class FileSizeControlMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "1024", property = "size", required = true)
     private long size;
+
+    public final void execute()
+        throws MojoFailureException {
+        getLog().info("Directory = " + directory.getPath());
+        getLog().info("max size = " + size);
+
+        if (!directory.exists()) {
+            getLog().error("Directory " + directory + " doesn't exists.");
+            throw new MojoFailureException("Directory doesn't exists.");
+        }
+        if (!directory.isDirectory()) {
+            getLog().error("Directory " + directory + " is not a directory.");
+            throw new MojoFailureException("Illegal directory path.");
+        }
+
+        FileVerifier verifer = new FileVerifier();
+        try {
+            Files.walkFileTree(Paths.get(directory.getPath()), verifer);
+        } catch (IOException e) {
+            getLog().error(e);
+            return;
+        }
+        if (!verifer.getVerifyResult()) {
+            throw new MojoFailureException("Large files detected.");
+        }
+    }
 
     class FileVerifier extends SimpleFileVisitor<Path> {
 
@@ -79,32 +104,6 @@ public class FileSizeControlMojo extends AbstractMojo {
             return verifyResult;
         }
 
-    }
-
-    public final void execute()
-        throws MojoExecutionException, MojoFailureException {
-        getLog().info("Directory = " + directory.getPath());
-        getLog().info("max size = " + size);
-
-        if (!directory.exists()) {
-            getLog().error("Directory " + directory + " doesn't exists.");
-            throw new MojoFailureException("Directory doesn't exists.");
-        }
-        if (!directory.isDirectory()) {
-            getLog().error("Directory " + directory + " is not a directory.");
-            throw new MojoFailureException("Illegal directory path.");
-        }
-
-        FileVerifier verifer = new FileVerifier();
-        try {
-            Files.walkFileTree(Paths.get(directory.getPath()), verifer);
-        } catch (IOException e) {
-            getLog().error(e);
-            return;
-        }
-        if (!verifer.getVerifyResult()) {
-            throw new MojoFailureException("Large files detected.");
-        }
     }
 
 }
