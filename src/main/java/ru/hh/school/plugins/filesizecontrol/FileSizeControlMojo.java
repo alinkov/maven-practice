@@ -78,7 +78,7 @@ public class FileSizeControlMojo extends AbstractMojo {
 
     class FileVerifier extends SimpleFileVisitor<Path> {
 
-        private boolean verifyResult;
+        private boolean verifyResult = true;
 
         @Override
         public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs)
