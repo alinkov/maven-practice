@@ -15,19 +15,17 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Goal which touches a timestamp file.
+ *         Show files from src, which were changed after last build.
+ *
+ *         Parameters:
+ *         onlyJava (boolean) - if true, show only *.java files;
+ *         maxAmount (int) - show not more than maxAmount recently changed files.
  *
  */
 
 
 @Mojo(name = "recentlyChanged", defaultPhase = LifecyclePhase.PRE_CLEAN, threadSafe = true)
 public class RecentlyChangesMojo extends AbstractMojo {
-/*
-        Show files from src, which were changed after last build.
-        Parameters:
-            onjyJava (boolean) - if true, show only *.java files;
-            maxAmount (int) - show not more than maxAmount recently changed files.
-*/
 
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
