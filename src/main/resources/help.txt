@@ -1,0 +1,21 @@
+usage: encoder [options] [plain file path] [cipher file path]
+
+Options:
+ -c                 Cipher file path
+ -d                 Specify decrypt operation
+ -e                 Specify encrypt operation
+ -h                 Display help information
+ -k                 Password or key file path
+ -p                 Plain file path
+ -v                 Display version information
+
+Examples:
+ encoder -k PasswordPhrase -p /somePath/someFile.fil                   - Creates /somePath/someFile.cip cipher file,
+                                                                         encrypted(by default) with PasswordPhrase
+
+ encoder -d -k somePath/someKey.key -c /anotherPath/anotherFile.cip    - Creates /anotherPath/anotherFile.pla file,
+                                                                         decrypted with key from somePath/someKey.key.
+
+ encoder -e -p /somePath/someFile.fil -c /anotherPath/cipherFile.fil   - Creates /anotherPath/cipherFile.fil file,
+                                                                         encrypted with generated key. Key file saves
+                                                                         at program directory.
