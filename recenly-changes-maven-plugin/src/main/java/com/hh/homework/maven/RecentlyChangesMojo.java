@@ -13,6 +13,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *         Show files from src, which were changed after last build.
@@ -27,52 +28,51 @@ import java.util.*;
 @Mojo(name = "recentlyChanged", defaultPhase = LifecyclePhase.PRE_CLEAN, threadSafe = true)
 public class RecentlyChangesMojo extends AbstractMojo {
 
-    @Parameter( defaultValue = "${project}", readonly = true )
+    @Parameter( defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private File outputDirectory;
 
-    @Parameter(property = "maxAmount", defaultValue = "-1")
+    @Parameter(defaultValue = "${jar.configuration.finalName}", readonly = true)
+    private String finalName;
+
+    @Parameter(property = "maxAmount", defaultValue = "-1", required = true)
     private int maxAmount;
 
-    @Parameter(property = "onlyJava", defaultValue="true")
+    @Parameter(property = "onlyJava", defaultValue="true", required = true)
     private boolean onlyJava;
 
     public void execute() throws MojoExecutionException {
 
-        String fileType = "";
-        if (onlyJava) {
-            fileType = " java";
-        }
+        getLog().info(finalName);
+        String fileType = onlyJava ? " java" : "";
         getLog().info("Looking for recently changed" + fileType + " files");
 
         try {
-            File packageFile = new File(outputDirectory, project.getName() + '-' +project.getVersion() + '.' + project.getPackaging());
+            String[] projectTypes = new String[] { "jar",  project.getPackaging()};
+            Long packageTime = FileUtils.listFiles(outputDirectory, projectTypes, true).stream()
+                .max((File a, File b)-> Long.compare(b.lastModified(), a.lastModified()))
+                .get()
+                .lastModified();
+            // теперь ищет последний пакедж в таргет, не делая предположения о его названии в jar или project.getPackaging() формате. jar дополнительно добавлен на случай неявного указаняия упаковки, как например в случае прое
 
-            RegexFileFilter fileFilter = new RegexFileFilter(".*");
-            if (onlyJava) {
-                fileFilter = new RegexFileFilter(".*java");
-            }
+            RegexFileFilter fileFilter = onlyJava ? new RegexFileFilter(".*java") : new RegexFileFilter(".*");
             File src = new File(project.getBasedir(), "src");
             Collection<File> allFiles = FileUtils.listFiles(src, fileFilter, TrueFileFilter.INSTANCE);
             getLog().info("Total file amount: " + allFiles.size());
 
-            ArrayList<File> changedFiles = new ArrayList();
-            for (File item : allFiles) {
-                if (item.lastModified() > packageFile.lastModified()) {
-                    changedFiles.add(item);
-                }
-            }
-            changedFiles.sort((File a, File b)-> a.lastModified() >  b.lastModified() ? -1 :  1);
+            List<File> changedFiles = allFiles.stream()
+                    .filter(x -> x.lastModified() > packageTime)
+                    .collect(Collectors.toList());
+
+            maxAmount = maxAmount < 0 ? changedFiles.size() : maxAmount;
             getLog().info("Recently changed file amount: " + changedFiles.size());
-            for (File item : changedFiles) {
-                if (0 == maxAmount) {
-                    break;
-                }
-                getLog().info(item.toString());
-                maxAmount -= 1;
-            }
+            changedFiles.stream()
+                    .sorted((File a, File b)-> Long.compare(b.lastModified(), a.lastModified()))
+                    .limit(maxAmount)
+                    .forEach(x -> getLog().info(x.toString()));
+
         } catch (Exception e) {
             getLog().error(e);
             throw new MojoExecutionException(e.getMessage());
