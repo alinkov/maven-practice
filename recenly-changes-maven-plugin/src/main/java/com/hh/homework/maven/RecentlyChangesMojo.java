@@ -34,9 +34,6 @@ public class RecentlyChangesMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private File outputDirectory;
 
-    @Parameter(defaultValue = "${jar.configuration.finalName}", readonly = true)
-    private String finalName;
-
     @Parameter(property = "maxAmount", defaultValue = "-1", required = true)
     private int maxAmount;
 
@@ -45,7 +42,6 @@ public class RecentlyChangesMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-        getLog().info(finalName);
         String fileType = onlyJava ? " java" : "";
         getLog().info("Looking for recently changed" + fileType + " files");
 
@@ -55,7 +51,6 @@ public class RecentlyChangesMojo extends AbstractMojo {
                 .max((File a, File b)-> Long.compare(b.lastModified(), a.lastModified()))
                 .get()
                 .lastModified();
-            // теперь ищет последний пакедж в таргет, не делая предположения о его названии в jar или project.getPackaging() формате. jar дополнительно добавлен на случай неявного указаняия упаковки, как например в случае прое
 
             RegexFileFilter fileFilter = onlyJava ? new RegexFileFilter(".*java") : new RegexFileFilter(".*");
             File src = new File(project.getBasedir(), "src");
