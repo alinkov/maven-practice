@@ -1,6 +1,5 @@
 package hh;
 
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Goal which scan dir and cgeck files
+ * Goal which scan dir and check files
  */
 @Mojo( name = "scanAndTest", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
 public class TestFiles
