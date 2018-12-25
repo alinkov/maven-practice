@@ -33,32 +33,12 @@ public class MyMojoTest
             throws Exception
     {
         File pom = new File( "." );
-
-        System.out.println(pom.getAbsolutePath());
-
         assertNotNull( pom );
         assertTrue( pom.exists() );
 
-        TestFiles testFiles = ( TestFiles ) rule.lookupConfiguredMojo( pom, "touch" );
+        TestFiles testFiles = ( TestFiles ) rule.lookupConfiguredMojo( pom, "scanAndTest" );
         assertNotNull( testFiles );
         testFiles.execute();
-
-        File scanDirectory = ( File ) rule.getVariableValueFromObject( testFiles, "scanDirectory" );
-        assertNotNull( scanDirectory );
-        assertTrue( scanDirectory.exists() );
-
-        File touch = new File( scanDirectory, "touch.txt" );
-        assertTrue( touch.exists() );
-
     }
-
-    /** Do not need the MojoRule. */
-    @WithoutMojo
-    @Test
-    public void testSomethingWhichDoesNotNeedTheMojoAndProbablyShouldBeExtractedIntoANewClassOfItsOwn()
-    {
-        assertTrue( true );
-    }
-
 }
 
