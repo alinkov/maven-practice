@@ -39,11 +39,11 @@ public class MyMojoTest
         assertNotNull( pom );
         assertTrue( pom.exists() );
 
-        MyMojo myMojo = ( MyMojo ) rule.lookupConfiguredMojo( pom, "touch" );
-        assertNotNull( myMojo );
-        myMojo.execute();
+        TestFiles testFiles = ( TestFiles ) rule.lookupConfiguredMojo( pom, "touch" );
+        assertNotNull( testFiles );
+        testFiles.execute();
 
-        File scanDirectory = ( File ) rule.getVariableValueFromObject( myMojo, "scanDirectory" );
+        File scanDirectory = ( File ) rule.getVariableValueFromObject( testFiles, "scanDirectory" );
         assertNotNull( scanDirectory );
         assertTrue( scanDirectory.exists() );
 

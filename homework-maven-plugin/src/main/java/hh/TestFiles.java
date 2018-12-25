@@ -16,7 +16,7 @@ import java.io.IOException;
  * Goal which touches a timestamp file.
  */
 @Mojo( name = "touch", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
-public class MyMojo
+public class TestFiles
     extends AbstractMojo
 {
     /**
