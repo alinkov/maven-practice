@@ -12,6 +12,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.logging.Log;
 
 /** Cache that use last modified date of file and store it in file. */
@@ -19,12 +20,17 @@ import org.apache.maven.plugin.logging.Log;
 @Singleton
 public class MapInFileCache implements StopListCache {
 
-  /** Map for cache result. Key is String canonical path to file Value is lastModified of file */
+  /** Map for cache result. Key is String canonical path to file Value is lastModified of file. */
   private HashMap<String, Long> lastModifiedCache = new HashMap<>();
 
   /** Path to file for cache result. */
-  private static final String FILE_CACHE_PATH =
-      "target/plugins-cache/stop-list/last-modified-files.cache";
+  private static final String CACHE_FILE_NAME = "last-modified-files.cache";
+
+  /** Default folder to store cache. */
+  private static final String DEFAULT_CACHE_FOLDER = "target/plugins-cache/stop-list";
+
+  /** Folder to store cache. */
+  private String cacheFolder = DEFAULT_CACHE_FOLDER;
 
   private Log logger;
 
@@ -67,16 +73,16 @@ public class MapInFileCache implements StopListCache {
 
   @Override
   public void beforeStart() {
-    File file = new File(FILE_CACHE_PATH);
+    File file = new File(getCacheFilePath());
     if (!file.exists()) {
       return;
     }
 
-    try (FileInputStream inputStream = new FileInputStream(FILE_CACHE_PATH);
+    try (FileInputStream inputStream = new FileInputStream(getCacheFilePath());
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
       lastModifiedCache = (HashMap) objectInputStream.readObject();
     } catch (Exception e) {
-      logger.info("Unable deserialize cache from file: " + FILE_CACHE_PATH);
+      logger.info("Unable deserialize cache from file: " + getCacheFilePath());
       logger.debug(e);
     }
   }
@@ -84,11 +90,11 @@ public class MapInFileCache implements StopListCache {
   @Override
   public void beforeClose() {
     // write cache to file
-    File cacheFile = new File(FILE_CACHE_PATH);
+    File cacheFile = new File(getCacheFilePath());
     try {
       FileUtils.touch(cacheFile);
     } catch (IOException e) {
-      logger.info("Unable create cache file: " + FILE_CACHE_PATH);
+      logger.info("Unable create cache file: " + getCacheFilePath());
       logger.debug(e);
     }
 
@@ -97,8 +103,26 @@ public class MapInFileCache implements StopListCache {
       objectOutputStream.flush();
       objectOutputStream.writeObject(lastModifiedCache);
     } catch (IOException e) {
-      logger.info("Unable create cache file: " + FILE_CACHE_PATH);
+      logger.info("Unable create cache file: " + getCacheFilePath());
       logger.debug(e);
     }
+  }
+
+  /**
+   * Setter for cache folder.
+   *
+   * @param cacheFolder path to cache folder
+   */
+  public void setCacheFolder(String cacheFolder) {
+    this.cacheFolder = cacheFolder;
+  }
+
+  /**
+   * Returns path to cache file.
+   *
+   * @return path
+   */
+  private String getCacheFilePath() {
+    return FilenameUtils.concat(cacheFolder, CACHE_FILE_NAME);
   }
 }

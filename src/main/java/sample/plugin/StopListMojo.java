@@ -39,8 +39,12 @@ public class StopListMojo extends AbstractMojo {
   String errorLevel;
 
   /** Should or not case of stop words will be ignored. */
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "ignoreCase")
   private boolean ignoreCase;
+
+  /** Folder to store plugin cache (if file cache used). */
+  @Parameter(property = "cacheFolder")
+  private String cacheFolder;
 
   /** If errors was found build will be breaking. */
   private boolean hasErrors = false;
@@ -61,8 +65,13 @@ public class StopListMojo extends AbstractMojo {
   /** Runs in start of plugin work. */
   private void init() {
     initCanonicalPaths();
-    cache.setLogger(getLog());
-    cache.beforeStart();
+    MapInFileCache fileCache = (MapInFileCache) cache;
+    fileCache.setLogger(getLog());
+    if (cacheFolder != null && !cacheFolder.isEmpty()) {
+      fileCache.setCacheFolder(cacheFolder);
+    }
+
+    fileCache.beforeStart();
   }
 
   /** Runs before plugin finish work. */
@@ -81,7 +90,8 @@ public class StopListMojo extends AbstractMojo {
       try {
         excludeCanonical.add(file.getCanonicalPath());
       } catch (IOException e) {
-        e.printStackTrace();
+        getLog().warn("Unable to get file info " + file.getPath());
+        getLog().debug(e);
       }
     }
   }
@@ -166,9 +176,7 @@ public class StopListMojo extends AbstractMojo {
       return;
     }
 
-    try {
-      Scanner scanner = new Scanner(file);
-
+    try (Scanner scanner = new Scanner(file)) {
       int lineNum = 0;
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine();
@@ -178,17 +186,9 @@ public class StopListMojo extends AbstractMojo {
           line = line.toLowerCase();
         }
 
-        for (String stopWord : stopWords) {
-          if (ignoreCase) {
-            stopWord = stopWord.toLowerCase();
-          }
-          if (line.contains(stopWord)) {
-            handleStopWordDetected(
-                String.format(
-                    "File contains stop-word '%s', path: %s, line %s",
-                    stopWord, file.getPath(), lineNum));
-          }
-        }
+        String errorMessage =
+            String.format("File contains stop-word, path: %s, line %s", file.getPath(), lineNum);
+        checkStringForStopWords(line, errorMessage);
       }
 
       cache.addToCache(file);
@@ -208,8 +208,27 @@ public class StopListMojo extends AbstractMojo {
       String canonicalFilePath = file.getCanonicalPath();
       return excludeCanonical.contains(canonicalFilePath);
     } catch (IOException e) {
-      e.printStackTrace();
+      getLog().warn("Unable to check file " + file.getPath());
+      getLog().debug(e);
       return false;
+    }
+  }
+
+  /**
+   * Checking is string contains stop-words and handle if positive.
+   *
+   * @param content for check
+   * @param errorMessage - error message for log
+   */
+  private void checkStringForStopWords(String content, String errorMessage) {
+    for (String stopWord : stopWords) {
+      if (ignoreCase) {
+        stopWord = stopWord.toLowerCase();
+      }
+
+      if (content.contains(stopWord)) {
+        handleStopWordDetected(errorMessage + ", stop word: " + stopWord);
+      }
     }
   }
 
