@@ -147,9 +147,10 @@
                             <ports>
                                 <port>${server.port}</port>
                             </ports>
-                            <dockerTags>
+                            <tags>
                                 <tag>latest</tag>
-                            </dockerTags>
+                                <tag>${scm.tag}</tag>
+                            </tags>
                         </configuration>
                     </plugin>
                 </plugins>

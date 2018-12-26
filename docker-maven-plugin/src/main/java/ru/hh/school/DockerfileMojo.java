@@ -38,51 +38,51 @@ public class DockerfileMojo extends AbstractMojo {
     /**
      * Dir for generated Dockerfile.
      */
-    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}")
+    @Parameter(property = "docker.outputDir", defaultValue = "${project.build.directory}")
     private String outputDir;
 
     /**
      * Artifact to be added to image.
      */
-    @Parameter(property = "artifactName",
+    @Parameter(property = "docker.artifactName",
             defaultValue = "${project.build.finalName}.${project.packaging}")
     private String artifactName;
 
     /**
      * Base image to build image.
      */
-    @Parameter(property = "baseImage", defaultValue = "openjdk:8-jre")
+    @Parameter(property = "docker.baseImage", defaultValue = "openjdk:8-jre")
     private String baseImage;
 
     /**
      * Run commands.
      */
-    @Parameter(property = "runs")
+    @Parameter(property = "docker.runs")
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<String> runs = new ArrayList<>();
 
     /**
      * Entrypoint generated in ["sh", "-c", "ls"] format.
      */
-    @Parameter(property = "entryPoint")
+    @Parameter(property = "docker.entryPoint")
     private List<String> entryPoint;
 
     /**
      * CMD generated in ["sh", "-c", "ls"] format.
      */
-    @Parameter(property = "cmd")
+    @Parameter(property = "docker.cmd")
     private List<String> cmd;
 
     /**
      * Volumes.
      */
-    @Parameter(property = "volumes")
+    @Parameter(property = "docker.volumes")
     private List<String> volumes = new ArrayList<>();
 
     /**
      * Exposed ports.
      */
-    @Parameter(property = "ports")
+    @Parameter(property = "docker.ports")
     private List<String> ports = new ArrayList<>();
 
     /**

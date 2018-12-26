@@ -25,33 +25,33 @@ public class BuildMojo extends AbstractMojo {
     /**
      * Command for run docker daemon.
      */
-    @Parameter(property = "dockerExec", defaultValue = "docker")
-    private String dockerExec;
+    @Parameter(property = "docker.exec", defaultValue = "docker")
+    private String exec;
 
     /**
      * Path to build context.
      */
-    @Parameter(property = "contextDir", defaultValue = "${project.build.directory}")
+    @Parameter(property = "docker.contextDir", defaultValue = "${project.build.directory}")
     private String contextDir;
 
     /**
      * Dockerfile name.
      */
-    @Parameter(property = "dockerfile", defaultValue = "Dockerfile")
+    @Parameter(property = "docker.dockerfile", defaultValue = "Dockerfile")
     private String dockerfile;
 
     /**
      * Name for image.
      */
-    @Parameter(property = "repositoryName", defaultValue = "${project.name}")
+    @Parameter(property = "docker.repositoryName", defaultValue = "${project.name}")
     private String repositoryName;
 
     /**
      * List of tags for image.
      */
-    @Parameter(property = "dockerTags", required = true)
+    @Parameter(property = "docker.tags", required = true)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private List<String> dockerTags;
+    private List<String> tags;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -82,15 +82,15 @@ public class BuildMojo extends AbstractMojo {
     }
 
     private List<String> buildCommand() throws MojoExecutionException {
-        if(dockerTags == null || dockerTags.isEmpty()) {
+        if(tags == null || tags.isEmpty()) {
             throw new MojoExecutionException("You should provide at least one tag");
         }
 
         List<String> command = new ArrayList<>();
-        command.add(dockerExec);
+        command.add(exec);
         command.add("build");
 
-        List<String> tagArgs = dockerTags.stream()
+        List<String> tagArgs = tags.stream()
                 .map(tag -> "-t" + repositoryName + ":" + tag)
                 .collect(Collectors.toList());
 

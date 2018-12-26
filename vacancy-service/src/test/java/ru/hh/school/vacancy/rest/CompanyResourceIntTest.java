@@ -10,11 +10,10 @@ public class CompanyResourceIntTest {
     private static final String DEFAULT_CONTACTS = "contacts";
 
     public static Company createEntity(EntityManager em) {
-        Company company = Company.builder()
+        return Company.builder()
                 .title(DEFAULT_TITLE)
                 .description(DEFAULT_DESCRIPTION)
                 .contacts(DEFAULT_CONTACTS)
                 .build();
-        return company;
     }
 }
