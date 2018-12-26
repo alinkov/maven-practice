@@ -9,7 +9,7 @@ public class CompanyMapper implements Mapper<Company, CompanyDTO> {
     @Override
     public CompanyDTO toDto(Company company) {
         if (company == null) {
-            throw new IllegalArgumentException("company should be not null");
+            throw new IllegalArgumentException("company should not be null");
         }
         return CompanyDTO.builder()
                 .id(company.getId())
@@ -22,7 +22,7 @@ public class CompanyMapper implements Mapper<Company, CompanyDTO> {
     @Override
     public Company toEntity(CompanyDTO companyDTO) {
         if (companyDTO == null) {
-            throw new IllegalArgumentException("companyDTO should be not null");
+            throw new IllegalArgumentException("companyDTO should not be null");
         }
         return Company.builder()
                 .id(companyDTO.getId())
