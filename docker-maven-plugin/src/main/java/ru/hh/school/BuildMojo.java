@@ -43,20 +43,23 @@ public class BuildMojo extends AbstractMojo {
     /**
      * Name for image.
      */
-    @Parameter(property = "imageName", defaultValue = "${project.name}")
-    private String imageName;
+    @Parameter(property = "repositoryName", defaultValue = "${project.name}")
+    private String repositoryName;
 
     /**
      * List of tags for image.
      */
-    @Parameter(property = "tags", defaultValue = "latest")
+    @Parameter(property = "dockerTags", required = true)
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private List<String> tags = new ArrayList<>();
+    private List<String> dockerTags;
 
     @Override
     public void execute() throws MojoExecutionException {
         List<String> command = buildCommand();
+        buildImage(command);
+    }
 
+    private void buildImage(List<String> command) throws MojoExecutionException {
         getLog().info("Start build image: " + String.join(" ", command));
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -78,14 +81,17 @@ public class BuildMojo extends AbstractMojo {
         getLog().info("Successful build image");
     }
 
-    private List<String> buildCommand() {
+    private List<String> buildCommand() throws MojoExecutionException {
+        if(dockerTags == null || dockerTags.isEmpty()) {
+            throw new MojoExecutionException("You should provide at least one tag");
+        }
 
         List<String> command = new ArrayList<>();
         command.add(dockerExec);
         command.add("build");
 
-        List<String> tagArgs = tags.stream()
-                .map(tag -> "-t" + imageName + ":" + tag)
+        List<String> tagArgs = dockerTags.stream()
+                .map(tag -> "-t" + repositoryName + ":" + tag)
                 .collect(Collectors.toList());
 
         command.addAll(tagArgs);
