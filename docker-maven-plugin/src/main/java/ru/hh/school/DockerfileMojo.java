@@ -123,7 +123,7 @@ public class DockerfileMojo extends AbstractMojo {
         }
 
         // Default
-        if (!cmd.isEmpty() && !entryPoint.isEmpty()) {
+        if (cmd.isEmpty() && entryPoint.isEmpty()) {
             dockerfile.add(
                     "ENTRYPOINT [\"/usr/bin/java\", \"-jar\", \"/usr/share/service/service.jar\"]\n"
             );
