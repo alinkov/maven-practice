@@ -10,8 +10,12 @@ public final class ArgumentsUtils {
 
     public static Operation getOperation(final String[] args) {
         for (String str : args) {
-            if ("-e".equals(str)) { return Operation.ENCRYPT; }
-            if ("-d".equals(str)) { return Operation.DECRYPT; }
+            if ("-e".equals(str)) {
+                return Operation.ENCRYPT;
+            }
+            if ("-d".equals(str)) {
+                return Operation.DECRYPT;
+            }
         }
         return Operation.ENCRYPT;
     }
@@ -44,7 +48,6 @@ public final class ArgumentsUtils {
     }
 
 
-
     public static String getPlainPath(final String[] args) {
         int i;
         for (i = 0; i < args.length; i++) {
@@ -54,7 +57,7 @@ public final class ArgumentsUtils {
             }
         }
         if ((i > args.length - 1) || args[i] == null || args[i].isEmpty() || (args[i].startsWith("-"))) {
-           return null;
+            return null;
         } else {
             return args[i];
         }
@@ -75,8 +78,7 @@ public final class ArgumentsUtils {
         }
     }
 
-    public static boolean isHelpKey(String[] args)
-    {
+    public static boolean isHelpKey(String[] args) {
         for (String str : args) {
             if ("-h".equals(str)) {
                 return true;
@@ -85,8 +87,7 @@ public final class ArgumentsUtils {
         return false;
     }
 
-    public static boolean isVersionKey(String[] args)
-    {
+    public static boolean isVersionKey(String[] args) {
         for (String str : args) {
             if ("-v".equals(str)) {
                 return true;
@@ -94,7 +95,6 @@ public final class ArgumentsUtils {
         }
         return false;
     }
-
 
 
 }

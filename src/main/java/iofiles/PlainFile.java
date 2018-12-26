@@ -4,12 +4,11 @@ import exceptions.EncoderFileException;
 import org.apache.log4j.Logger;
 import secure.DataBlock;
 import secure.HashUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,10 +37,10 @@ public class PlainFile extends File {
             log.error("Reading file to decode: file not found");
             throw new EncoderFileException("Reading file to decode: file not found");
         }
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
         byte[] result = null;
-        try {
-            FileInputStream stream = new FileInputStream(this);
+        try (FileInputStream stream = new FileInputStream(this);
+             ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             int size = 0;
             while (stream.available() > 0) {
                 size += stream.available();
@@ -64,8 +63,7 @@ public class PlainFile extends File {
         }
 
 
-        try {
-            FileOutputStream stream = new FileOutputStream(this);
+        try (FileOutputStream stream = new FileOutputStream(this)) {
             stream.write(data);
         } catch (IOException e) {
             log.error("Writing decrypted file: error");

@@ -11,6 +11,7 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+
 public class TestEncrypting {
 
     @Test
@@ -24,20 +25,16 @@ public class TestEncrypting {
         List<DataBlock> decryptedData2 = aes2.decryptData(cipherData);
 
         boolean result1 = true;
-        for(int i = 0; i < plainData.size();i++)
-        {
-            if(!plainData.get(i).equals(decryptedData1.get(i)))
-            {
+        for (int i = 0; i < plainData.size(); i++) {
+            if (!plainData.get(i).equals(decryptedData1.get(i))) {
                 result1 = false;
                 break;
             }
         }
 
         boolean result2 = true;
-        for(int i = 0; i < plainData.size();i++)
-        {
-            if(!plainData.get(i).equals(decryptedData2.get(i)))
-            {
+        for (int i = 0; i < plainData.size(); i++) {
+            if (!plainData.get(i).equals(decryptedData2.get(i))) {
                 result2 = false;
                 break;
             }

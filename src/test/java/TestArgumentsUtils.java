@@ -3,8 +3,6 @@
  */
 
 
-import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -27,14 +25,6 @@ public class TestArgumentsUtils {
     String[] argsC = {"-c", "/somePath/file.cip", "-p", "/somePath/file.fil", "-k", "PASSWORD"};
     String[] argsD = {"-d", "-c", "/somePath/file.cip", "-p", "/somePath/file.fil", "-k", "PASSWORD"};
 
-    @BeforeClass
-    public static void setup() {
-
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     @Test
     public void testGetOperation() {

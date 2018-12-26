@@ -1,14 +1,15 @@
 import exceptions.EncoderFileException;
 import iofiles.CipherFile;
 import iofiles.PlainFile;
+import org.apache.log4j.Logger;
 import secure.AES;
 import secure.DataBlock;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
-import org.apache.log4j.Logger;
 
 
 public final class Encoder {
@@ -93,13 +94,13 @@ public final class Encoder {
             log.error("Unknown error");
         }
 
+
     }
 
     public static void printProperties() {
         log.info("Print version");
-        InputStream inputStream = Encoder.class.getClassLoader().getResourceAsStream("resource.properties");
         Properties property = new Properties();
-        try {
+        try (InputStream inputStream = Encoder.class.getClassLoader().getResourceAsStream("resource.properties")) {
             property.load(inputStream);
             String version = property.getProperty("project.version");
             String name = property.getProperty("project.name");
@@ -109,10 +110,9 @@ public final class Encoder {
         }
     }
 
-    public static void printHelp()   {
+    public static void printHelp() {
         log.info("Print help");
-        InputStream inputStream = Encoder.class.getClassLoader().getResourceAsStream("help.txt");
-        try {
+        try (InputStream inputStream = Encoder.class.getClassLoader().getResourceAsStream("help.txt")) {
             while (inputStream.available() > 0) {
                 System.out.write(inputStream.read());
             }

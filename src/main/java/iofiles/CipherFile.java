@@ -3,12 +3,11 @@ package iofiles;
 import exceptions.EncoderFileException;
 import org.apache.log4j.Logger;
 import secure.DataBlock;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +25,9 @@ public class CipherFile extends File {
             log.error("Readind encrypted file: file not found");
             throw new EncoderFileException("Readind encrypted file: file not found");
         }
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         byte[] result = null;
-        try {
-            FileInputStream stream = new FileInputStream(this);
+        try (FileInputStream stream = new FileInputStream(this);
+             ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             int size = 0;
             while (stream.available() > 0) {
                 size += stream.available();
@@ -55,8 +53,7 @@ public class CipherFile extends File {
             throw new EncoderFileException("Writing encrypted file: Invalid filepath");
         }
 
-        try {
-            FileOutputStream stream = new FileOutputStream(this);
+        try (FileOutputStream stream = new FileOutputStream(this)) {
             stream.write(data);
         } catch (IOException e) {
             log.error("Writing encrypted file: error");
@@ -103,12 +100,13 @@ public class CipherFile extends File {
 
     private byte[] createByteArray(List<DataBlock> data) throws EncoderFileException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        for (DataBlock block : data) {
-            try {
+        try {
+            for (DataBlock block : data) {
                 stream.write(block.getBytes());
-            } catch (IOException e) {
-
             }
+            stream.close();
+        } catch (IOException e) {
+
         }
         return stream.toByteArray();
     }

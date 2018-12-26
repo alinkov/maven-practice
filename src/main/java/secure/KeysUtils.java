@@ -17,6 +17,7 @@ public final class KeysUtils {
     private static final int LONG_BYTES_COUNT = 8;
     private static final int BYTE_BITS_COUNT = 8;
     private static Logger log = Logger.getLogger(KeysUtils.class);
+
     private KeysUtils() {
     }
 
@@ -47,15 +48,12 @@ public final class KeysUtils {
         }
         File keyFile = new File(filepath);
         byte[] result = new byte[KEY_SIZE];
-        FileInputStream stream = null;
-        try {
-            stream = new FileInputStream(keyFile);
+        try (FileInputStream stream = new FileInputStream(keyFile)) {
             if (stream.available() != KEY_SIZE) {
                 log.error("Reading key file: invalid key file");
                 throw new EncoderFileException("Reading key file: invalid key file");
             }
             stream.read(result, 0, KEY_SIZE);
-            stream.close();
         } catch (IOException e) {
             log.error("Reading key file: error");
             throw new EncoderFileException("Reading key file: error");
@@ -73,10 +71,8 @@ public final class KeysUtils {
             filepath += ".key";
         }
         File keyFile = new File(filepath);
-        try {
-            FileOutputStream stream = new FileOutputStream(keyFile);
+        try (FileOutputStream stream = new FileOutputStream(keyFile)) {
             stream.write(key);
-            stream.close();
         } catch (IOException e) {
             log.error("Writing key file: error");
             throw new EncoderFileException("Writing key file: error");
