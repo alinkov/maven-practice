@@ -1,9 +1,4 @@
 spring:
-  devtools:
-    restart:
-      enabled: true
-    livereload:
-      enabled: false
   jackson:
     serialization.indent_output: true
   datasource:
@@ -13,14 +8,10 @@ spring:
     password:
     hikari:
       auto-commit: false
-  h2:
-    console:
-      enabled: false
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     database: H2
-    show-sql: true
-    open-in-view: false
+    show-sql: false
     properties:
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
