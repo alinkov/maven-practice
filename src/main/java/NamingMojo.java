@@ -12,17 +12,30 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+/**
+ * Goal which changes a greeted name.
+ */
+
 @Mojo(name = "setname", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true)
 public class NamingMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.groupId}.", readonly = true)
     private String groupTarget;
 
+    /**
+     * Target class.
+     */
     @Parameter(property = "classTarget")
     private String classTarget;
 
+    /**
+     * Target field.
+     */
     @Parameter(property = "fieldTarget")
     private String fieldTarget;
 
+    /**
+     * Message on success.
+     */
     @Parameter(defaultValue = "Поле содержит: ", property = "message")
     private String message;
 
