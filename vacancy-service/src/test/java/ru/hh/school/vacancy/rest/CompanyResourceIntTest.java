@@ -1,8 +1,8 @@
 package ru.hh.school.vacancy.rest;
 
-import ru.hh.school.vacancy.domain.Company;
-
 import javax.persistence.EntityManager;
+
+import ru.hh.school.vacancy.domain.Company;
 
 public class CompanyResourceIntTest {
     private static final String DEFAULT_TITLE = "company";

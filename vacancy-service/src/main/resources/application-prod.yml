@@ -1,6 +1,4 @@
 spring:
-  jackson:
-    serialization.indent_output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:h2:file:./target/h2db/db/vacancy;DB_CLOSE_DELAY=-1
