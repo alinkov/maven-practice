@@ -13,7 +13,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Goal which changes a greeted name.
+ * Goal which changes a greeted name. Default class - Target, default Field - Field.
  */
 
 @Mojo(name = "setname", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true)
@@ -24,13 +24,13 @@ public class NamingMojo extends AbstractMojo {
     /**
      * Target class.
      */
-    @Parameter(property = "classTarget")
+    @Parameter(defaultValue = "Target", property = "classTarget")
     private String classTarget;
 
     /**
      * Target field.
      */
-    @Parameter(property = "fieldTarget")
+    @Parameter(defaultValue = "Field", property = "fieldTarget")
     private String fieldTarget;
 
     /**
