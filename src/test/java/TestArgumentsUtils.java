@@ -3,6 +3,8 @@
  */
 
 
+import hhtask.ArgumentsUtils;
+import hhtask.Operation;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -30,7 +32,7 @@ public class TestArgumentsUtils {
     public void testGetOperation() {
         Operation operation = null;
         assertTrue(ArgumentsUtils.getOperation(args1)==Operation.ENCRYPT);
-        assertTrue(ArgumentsUtils.getOperation(args2)==Operation.DECRYPT);
+        assertTrue(ArgumentsUtils.getOperation(args2)== Operation.DECRYPT);
         assertTrue(ArgumentsUtils.getOperation(args5)==Operation.ENCRYPT);
         assertTrue(ArgumentsUtils.getOperation(args6)==Operation.DECRYPT);
         assertTrue(ArgumentsUtils.getOperation(args7)==Operation.ENCRYPT);

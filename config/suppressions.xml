@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+    <suppress checks="JavadocMethod" files=".java"/>
+    <suppress checks="JavadocVariable" files=".java"/>
+    <suppress checks="JavadocType" files=".java"/>
+    <suppress checks="JavadocPackage" files=".java"/>
+    <suppress checks="LineLength" files=".java"/>
+    <suppress checks="MagicNumber" files="AES.java"/><!--там сплошные Magic numbers их не имеет смысла выделять в параметры-->
+    <suppress checks="MagicNumber" files="PlainFile.java" lines="78,79,87,88"/><!--4 байта в int, 8 бит в байте, нет смысла выделять в параметры, они не поменяются-->
+</suppressions>

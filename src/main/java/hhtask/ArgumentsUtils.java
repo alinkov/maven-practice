@@ -1,5 +1,7 @@
-import exceptions.EncoderFileException;
-import secure.KeysUtils;
+package hhtask;
+
+import hhtask.exceptions.EncoderFileException;
+import hhtask.secure.KeysUtils;
 
 import java.io.File;
 
@@ -78,7 +80,7 @@ public final class ArgumentsUtils {
         }
     }
 
-    public static boolean isHelpKey(String[] args) {
+    public static boolean isHelpKey(final String[] args) {
         for (String str : args) {
             if ("-h".equals(str)) {
                 return true;
@@ -87,7 +89,7 @@ public final class ArgumentsUtils {
         return false;
     }
 
-    public static boolean isVersionKey(String[] args) {
+    public static boolean isVersionKey(final String[] args) {
         for (String str : args) {
             if ("-v".equals(str)) {
                 return true;

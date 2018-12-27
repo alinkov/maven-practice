@@ -1,10 +1,10 @@
-package secure;
+package hhtask.secure;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AES {
+public final class AES {
 
     private static final int[] SBOX = {
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -57,11 +57,11 @@ public class AES {
 
     private int[] expandedKey = new int[11 * AES_KEY_SIZE];
 
-    public AES(byte[] key) {
+    public AES(final byte[] key) {
         expandKey(key);
     }
 
-    public List<DataBlock> encryptData(List<DataBlock> data) {
+    public List<DataBlock> encryptData(final List<DataBlock> data) {
         List<DataBlock> result = new ArrayList<>(data.size());
         DataBlock feedBack = new DataBlock(INITIAL_VECTOR);
         for (int i = 0; i < data.size(); i++) {
@@ -73,7 +73,7 @@ public class AES {
         return result;
     }
 
-    public List<DataBlock> decryptData(List<DataBlock> data) {
+    public List<DataBlock> decryptData(final List<DataBlock> data) {
         List<DataBlock> result = new ArrayList<>(data.size());
         DataBlock feedBack = new DataBlock(INITIAL_VECTOR);
         for (int i = 0; i < data.size(); i++) {
@@ -87,39 +87,39 @@ public class AES {
     }
 
 
-    private DataBlock encryptBlock(DataBlock block) {
+    private DataBlock encryptBlock(final DataBlock block) {
 
-        block = addRoundKey(0, block);
+        DataBlock result = addRoundKey(0, block);
         for (int i = 1; i <= 9; i++) {
-            block = subBytes(block);
-            block = shiftRows(block);
-            block = mixColumns(block);
-            block = addRoundKey(i, block);
+            result = subBytes(result);
+            result = shiftRows(result);
+            result = mixColumns(result);
+            result = addRoundKey(i, result);
         }
-        block = subBytes(block);
-        block = shiftRows(block);
-        block = addRoundKey(10, block);
-        return block;
+        result = subBytes(result);
+        result = shiftRows(result);
+        result = addRoundKey(10, result);
+        return result;
     }
 
 
-    private DataBlock decryptBlock(DataBlock block) {
+    private DataBlock decryptBlock(final DataBlock block) {
 
-        block = addRoundKey(10, block);
+        DataBlock result = addRoundKey(10, block);
         for (int i = 9; i >= 1; i--) {
-            block = invShiftRows(block);
-            block = invSubBytes(block);
-            block = addRoundKey(i, block);
-            block = invMixColumns(block);
+            result = invShiftRows(result);
+            result = invSubBytes(result);
+            result = addRoundKey(i, result);
+            result = invMixColumns(result);
         }
-        block = invShiftRows(block);
-        block = invSubBytes(block);
-        block = addRoundKey(0, block);
-        return block;
+        result = invShiftRows(result);
+        result = invSubBytes(result);
+        result = addRoundKey(0, result);
+        return result;
     }
 
 
-    private DataBlock addRoundKey(int round, DataBlock block) {
+    private DataBlock addRoundKey(final int round, final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
         for (int i = 0; i < AES_BLOCK_SIZE; i++) {
@@ -128,7 +128,7 @@ public class AES {
         return new DataBlock(result);
     }
 
-    private void expandKey(byte[] key) {
+    private void expandKey(final byte[] key) {
         for (int i = 0; i < key.length; i++) {
             expandedKey[i] = 0xFF & key[i];
         }
@@ -151,7 +151,7 @@ public class AES {
 
     }
 
-    private DataBlock subBytes(DataBlock block) {
+    private DataBlock subBytes(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
         for (int i = 0; i < array.length; i++) {
@@ -161,7 +161,7 @@ public class AES {
     }
 
 
-    private DataBlock invSubBytes(DataBlock block) {
+    private DataBlock invSubBytes(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
         for (int i = 0; i < array.length; i++) {
@@ -171,7 +171,7 @@ public class AES {
     }
 
 
-    private DataBlock shiftRows(DataBlock block) {
+    private DataBlock shiftRows(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
         result[0] = array[0];
@@ -194,7 +194,7 @@ public class AES {
     }
 
 
-    private DataBlock invShiftRows(DataBlock block) {
+    private DataBlock invShiftRows(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
         result[0] = array[0];
@@ -217,7 +217,7 @@ public class AES {
     }
 
 
-    private DataBlock mixColumns(DataBlock block) {
+    private DataBlock mixColumns(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
 
@@ -236,7 +236,7 @@ public class AES {
     }
 
 
-    private DataBlock invMixColumns(DataBlock block) {
+    private DataBlock invMixColumns(final DataBlock block) {
         byte[] array = block.getBytes();
         byte[] result = new byte[AES_BLOCK_SIZE];
 
@@ -255,32 +255,36 @@ public class AES {
     }
 
 
-    private byte mul1(byte b) {
+    private byte mul1(final byte b) {
         return b;
     }
 
-    private byte mul2(byte b) {
+    private byte mul2(final byte b) {
         byte a = (byte) ((b << 1) & 0xff);
-        return (b & 0x80) == 0 ? a : (byte) (a ^ 0x1b);
+        if ((b & 0x80) == 0) {
+            return a;
+        } else {
+            return (byte) (a ^ 0x1b);
+        }
     }
 
-    private byte mul3(byte b) {
+    private byte mul3(final byte b) {
         return (byte) ((mul2(b) ^ b) & 0xFF);
     }
 
-    private byte mul9(byte b) {
+    private byte mul9(final byte b) {
         return (byte) ((mul2(mul2(mul2(b))) ^ b) & 0xFF);
     }
 
-    private byte mulB(byte b) {
+    private byte mulB(final byte b) {
         return (byte) ((mul2(mul2(mul2(b))) ^ mul2(b) ^ b) & 0xFF);
     }
 
-    private byte mulD(byte b) {
+    private byte mulD(final byte b) {
         return (byte) ((mul2(mul2(mul2(b))) ^ mul2(mul2(b)) ^ b) & 0xFF);
     }
 
-    private byte mulE(byte b) {
+    private byte mulE(final byte b) {
         return (byte) ((mul2(mul2(mul2(b))) ^ mul2(mul2(b)) ^ mul2(b)) & 0xFF);
     }
 

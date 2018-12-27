@@ -1,14 +1,14 @@
-package secure;
+package hhtask.secure;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DataBlock {
+public final class DataBlock {
     public static final int BLOCK_SIZE = 16;
     private final byte[] blockData;
 
-    public DataBlock(byte[] data) {
+    public DataBlock(final byte[] data) {
         this.blockData = data;
     }
 
@@ -17,7 +17,7 @@ public class DataBlock {
         return blockData;
     }
 
-    public static DataBlock xorBlocks(DataBlock a, DataBlock b) {
+    public static DataBlock xorBlocks(final DataBlock a, final DataBlock b) {
         byte[] bytes = new byte[BLOCK_SIZE];
         for (int i = 0; i < BLOCK_SIZE; i++) {
             bytes[i] = (byte) (a.getBytes()[i] ^ b.getBytes()[i]);
@@ -31,7 +31,7 @@ public class DataBlock {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -56,11 +56,16 @@ public class DataBlock {
         return blockData.hashCode();
     }
 
-    public static List<DataBlock> getList(byte[] array) {
+    public static List<DataBlock> getList(final byte[] array) {
         List<DataBlock> result = new ArrayList<>();
         int pos = 0;
         while (pos < array.length) {
-            int length = (array.length - pos) > BLOCK_SIZE ? BLOCK_SIZE : array.length - pos;
+            int length;
+            if ((array.length - pos) > BLOCK_SIZE) {
+                length = BLOCK_SIZE;
+            } else {
+                length = array.length - pos;
+            }
             byte[] temp = new byte[BLOCK_SIZE];
             System.arraycopy(array, pos, temp, 0, length);
             DataBlock block = new DataBlock(temp);

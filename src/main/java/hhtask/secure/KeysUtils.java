@@ -1,7 +1,7 @@
-package secure;
+package hhtask.secure;
 
 
-import exceptions.EncoderFileException;
+import hhtask.exceptions.EncoderFileException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
@@ -21,7 +21,7 @@ public final class KeysUtils {
     private KeysUtils() {
     }
 
-    public static byte[] getKeyFromString(String str) {
+    public static byte[] getKeyFromString(final String str) {
         log.info("Creating key from password");
         return DigestUtils.md5(str);
     }
@@ -40,7 +40,7 @@ public final class KeysUtils {
         return DigestUtils.md5(temp);
     }
 
-    public static byte[] readKeyFromFile(String filepath) throws EncoderFileException {
+    public static byte[] readKeyFromFile(final  String filepath) throws EncoderFileException {
         log.info("Reading keyfrom file");
         if (filepath == null || filepath.isEmpty() || !filepath.endsWith(".key")) {
             log.error("Reading key file: file not found");
@@ -61,16 +61,17 @@ public final class KeysUtils {
         return result;
     }
 
-    public static void saveKeyToFile(String filepath, final byte[] key) throws EncoderFileException {
+    public static void saveKeyToFile(final String filepath, final byte[] key) throws EncoderFileException {
         log.info("Saving key to file");
         if (filepath == null || filepath.isEmpty()) {
             log.error("Writing key file: invalid filename");
             throw new EncoderFileException("Writing key file: invalid filename");
         }
-        if (!filepath.endsWith(".key")) {
-            filepath += ".key";
+        String file = filepath;
+        if (!file.endsWith(".key")) {
+            file += ".key";
         }
-        File keyFile = new File(filepath);
+        File keyFile = new File(file);
         try (FileOutputStream stream = new FileOutputStream(keyFile)) {
             stream.write(key);
         } catch (IOException e) {

@@ -37,9 +37,6 @@
         </profile>
     </profiles>
 
-
-
-
     <repositories>
         <repository>
             <id>MavenCentral</id>
@@ -48,12 +45,10 @@
         </repository>
     </repositories>
 
-
     <scm>
         <connection>scm:git:git@github.com:SuhoyVasya/maven-practice.git</connection>
         <developerConnection>scm:git:git@github.com:SuhoyVasya/maven-practice.git</developerConnection>
-     <tag>encoder-1.1</tag>
-  </scm>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -145,7 +140,8 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.17</version>
                 <configuration>
-                    <configLocation>config/checkstyle.xml</configLocation>
+                    <suppressionsLocation>config/suppressions.xml</suppressionsLocation>
+                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
                 <executions>

@@ -1,8 +1,8 @@
-package iofiles;
+package hhtask.iofiles;
 
-import exceptions.EncoderFileException;
+import hhtask.exceptions.EncoderFileException;
 import org.apache.log4j.Logger;
-import secure.DataBlock;
+import hhtask.secure.DataBlock;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CipherFile extends File {
+public final class CipherFile extends File {
 
     private List<DataBlock> dataList;
     private static Logger log = Logger.getLogger(CipherFile.class);
 
-    public CipherFile(String pathname) {
+    public CipherFile(final String pathname) {
         super(pathname);
     }
 
@@ -35,7 +35,7 @@ public class CipherFile extends File {
                 stream.read(result, 0, stream.available());
                 bytes.write(result);
             }
-            if (size % 16 != 0) {
+            if (size % DataBlock.BLOCK_SIZE != 0) {
                 log.error("Readind encrypted file: invalid file");
                 throw new EncoderFileException("Readind encrypted file: invalid file");
             }
@@ -47,7 +47,7 @@ public class CipherFile extends File {
         return result;
     }
 
-    private void writeDataToFile(byte[] data) throws EncoderFileException {
+    private void writeDataToFile(final byte[] data) throws EncoderFileException {
         if (!isValidFilepath()) {
             log.error("Writing encrypted file: Invalid filepath");
             throw new EncoderFileException("Writing encrypted file: Invalid filepath");
@@ -78,13 +78,13 @@ public class CipherFile extends File {
         return dataList;
     }
 
-    public void writeData(List<DataBlock> data) throws EncoderFileException {
+    public void writeData(final List<DataBlock> data) throws EncoderFileException {
         this.dataList = data;
         writeDataToFile(createByteArray(data));
     }
 
 
-    private List<DataBlock> createDataList(byte[] array) {
+    private List<DataBlock> createDataList(final byte[] array) {
         List<DataBlock> result = new ArrayList<>(array.length / DataBlock.BLOCK_SIZE);
         int length = DataBlock.BLOCK_SIZE;
         int pos = 0;
@@ -98,7 +98,7 @@ public class CipherFile extends File {
         return result;
     }
 
-    private byte[] createByteArray(List<DataBlock> data) throws EncoderFileException {
+    private byte[] createByteArray(final List<DataBlock> data) throws EncoderFileException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
             for (DataBlock block : data) {

@@ -1,9 +1,9 @@
-package iofiles;
+package hhtask.iofiles;
 
-import exceptions.EncoderFileException;
+import hhtask.exceptions.EncoderFileException;
 import org.apache.log4j.Logger;
-import secure.DataBlock;
-import secure.HashUtils;
+import hhtask.secure.DataBlock;
+import hhtask.secure.HashUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PlainFile extends File {
+public final class PlainFile extends File {
     private static Logger log = Logger.getLogger(PlainFile.class);
     private List<DataBlock> dataList;
 
+    public static final int BLOCK_SIZE = 16;
 
-    public PlainFile(String pathname) {
+
+    public PlainFile(final  String pathname) {
         super(pathname);
     }
 
@@ -56,7 +58,7 @@ public class PlainFile extends File {
         return result;
     }
 
-    private void writeDataToFile(byte[] data) throws EncoderFileException {
+    private void writeDataToFile(final byte[] data) throws EncoderFileException {
         if (!isValidFilepath()) {
             log.error("Writing decrypted file: invalid filepath");
             throw new EncoderFileException("Writing decrypted file: invalid filepath");
@@ -71,7 +73,7 @@ public class PlainFile extends File {
         }
     }
 
-    private DataBlock getSizeBlock(int size) {
+    private DataBlock getSizeBlock(final int size) {
         byte[] tmp = new byte[DataBlock.BLOCK_SIZE];
         for (int i = 0; i < 4; i++) {
             tmp[i] = (byte) ((size >> i * 8) & 0xFF);
@@ -79,7 +81,7 @@ public class PlainFile extends File {
         return new DataBlock(tmp);
     }
 
-    private int getSizeValue(DataBlock block) {
+    private int getSizeValue(final DataBlock block) {
         byte[] tmp = block.getBytes();
         int size = 0;
         for (int i = 0; i < 4; i++) {
@@ -88,24 +90,29 @@ public class PlainFile extends File {
         return size;
     }
 
-    private List<DataBlock> createDataList(byte[] array) {
+    private List<DataBlock> createDataList(final byte[] array) {
         List<DataBlock> result = new ArrayList<>();
         result.add(getSizeBlock(array.length));
         int pos = 0;
         while (pos < array.length) {
-            int length = (array.length - pos) > DataBlock.BLOCK_SIZE ? DataBlock.BLOCK_SIZE : array.length - pos;
+            int length;
+            if ((array.length - pos) > DataBlock.BLOCK_SIZE) {
+                length = DataBlock.BLOCK_SIZE;
+            } else {
+                length = array.length - pos;
+            }
             byte[] temp = new byte[DataBlock.BLOCK_SIZE];
             System.arraycopy(array, pos, temp, 0, length);
             DataBlock block = new DataBlock(temp);
             result.add(block);
-            pos += 16;
+            pos += DataBlock.BLOCK_SIZE;
         }
         DataBlock hash = HashUtils.getHash(result);
         result.add(hash);
         return result;
     }
 
-    private byte[] createByteArray(List<DataBlock> data) throws EncoderFileException {
+    private byte[] createByteArray(final List<DataBlock> data) throws EncoderFileException {
         if (data.size() <= 2) {
             log.error("Decrypting file: invalid data");
             throw new EncoderFileException("Decrypting file: invalid data");
@@ -125,7 +132,12 @@ public class PlainFile extends File {
         while ((pos < size) && iterator.hasNext()) {
             DataBlock current = iterator.next();
             byte[] tmp = current.getBytes();
-            int length = (size - pos) > 16 ? 16 : size - pos;
+            int length;
+            if ((size - pos) > DataBlock.BLOCK_SIZE) {
+                length = DataBlock.BLOCK_SIZE;
+            } else {
+                length = size - pos;
+            }
             stream.write(tmp, 0, length);
             pos += DataBlock.BLOCK_SIZE;
         }
@@ -139,7 +151,7 @@ public class PlainFile extends File {
         return dataList;
     }
 
-    public void writeData(List<DataBlock> data) throws EncoderFileException {
+    public void writeData(final List<DataBlock> data) throws EncoderFileException {
         this.dataList = data;
         writeDataToFile(createByteArray(data));
     }

@@ -1,7 +1,7 @@
-package exceptions;
+package hhtask.exceptions;
 
 public class EncoderFileException extends Exception {
-    public EncoderFileException(String message) {
+    public EncoderFileException(final String message) {
         super(message);
     }
 }

@@ -1,9 +1,9 @@
-import exceptions.EncoderFileException;
-import iofiles.PlainFile;
+import hhtask.exceptions.EncoderFileException;
+import hhtask.iofiles.PlainFile;
 import org.junit.Test;
-import secure.AES;
-import secure.DataBlock;
-import secure.KeysUtils;
+import hhtask.secure.AES;
+import hhtask.secure.DataBlock;
+import hhtask.secure.KeysUtils;
 
 
 import java.util.List;

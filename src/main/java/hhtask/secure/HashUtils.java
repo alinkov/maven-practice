@@ -1,4 +1,4 @@
-package secure;
+package hhtask.secure;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -12,7 +12,7 @@ public final class HashUtils {
     private HashUtils() {
     }
 
-    public static DataBlock getHash(List<DataBlock> data) {
+    public static DataBlock getHash(final List<DataBlock> data) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         for (DataBlock block : data) {
             try {
@@ -24,7 +24,7 @@ public final class HashUtils {
         return new DataBlock(hash);
     }
 
-    public static boolean checkHash(List<DataBlock> data, DataBlock hash) {
+    public static boolean checkHash(final List<DataBlock> data, final DataBlock hash) {
         return hash.equals(getHash(data));
     }
 }
