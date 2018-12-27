@@ -9,13 +9,13 @@
     <artifactId>maven.practice</artifactId>
     <packaging>pom</packaging>
     <version>1.0.2-SNAPSHOT</version>
+    <name>maven.practice</name>
+    <url>https://school.hh.ru/</url>
+
     <modules>
         <module>docker-maven-plugin</module>
         <module>vacancy-service</module>
     </modules>
-
-    <name>maven.practice</name>
-    <url>https://school.hh.ru/</url>
 
     <scm>
         <connection>scm:git:git@github.com:sersamof/maven-practice.git</connection>
