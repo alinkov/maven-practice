@@ -17,27 +17,27 @@ public class CheckFilesMojo extends AbstractMojo {
      * Path to the top directory
      */
     @Parameter(property = "path", defaultValue = "./")
-    private String path;
+    private File path;
 
     /**
      * Number to compare with count files in directory
      */
     @Parameter(property = "count", defaultValue = "20")
-    private String count;
+    private int count;
 
     public void execute()
             throws MojoExecutionException {
-        int countFiles = getCount(new File(path));
+        int countFiles = getCount(path);
         getLog().info("------------------------------------------------------------------------");
         getLog().info("              The required directory has " + countFiles + " files.");
-        if (countFiles > Integer.parseInt(count)) {
+        if (countFiles > count) {
             getLog().info("                   That's more than " + count + " files.");
         }
         else {
             getLog().info("                   That's less than " + count + " files.");
             getLog().info("------------------------------------------------------------------------");
             getLog().info("Detailing:");
-            getDetailing(new File(path));
+            getDetailing(path);
         }
         getLog().info("------------------------------------------------------------------------");
     }
