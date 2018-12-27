@@ -7,20 +7,21 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- *  This plugin counts the files number in a directory
+ *   This plugin counts the files number in a directory
  *  and displays the detailing (count of сontaining files and subdirectories)
  *  if their number does not exceed the specified.
- *
- *  Parameters:
- *  path - path to the top directory
- *  count - number to compare with count files in directory
  */
-
-@Mojo(name = "check-count")
+@Mojo(name = "check-files")
 public class CheckFilesMojo extends AbstractMojo {
+    /**
+     * Path to the top directory
+     */
     @Parameter(property = "path", defaultValue = "./")
     private String path;
 
+    /**
+     * Number to compare with count files in directory
+     */
     @Parameter(property = "count", defaultValue = "20")
     private String count;
 
@@ -40,9 +41,9 @@ public class CheckFilesMojo extends AbstractMojo {
         }
         System.out.println("-------------------------------------------------------------------------------");
     }
-    private int getCount(File Directory) {
+    private int getCount(File directory) {
         int filesCount = 0;
-        File[] listFiles = Directory.listFiles();
+        File[] listFiles = directory.listFiles();
         assert listFiles != null;
         for (File subFile : listFiles) {
             if (subFile.isFile()) {
@@ -54,10 +55,10 @@ public class CheckFilesMojo extends AbstractMojo {
         return (filesCount);
     }
 
-    private void getDetailing(File Directory) {
+    private void getDetailing(File directory) {
         int filesCount = 0;
         int directoryCount = 0;
-        File[] listFiles = Directory.listFiles();
+        File[] listFiles = directory.listFiles();
         assert listFiles != null;
         for (File subFile : listFiles) {
             if (subFile.isFile()) {
@@ -67,6 +68,6 @@ public class CheckFilesMojo extends AbstractMojo {
                 getDetailing(subFile);
             }
         }
-        System.out.println("Directory " + Directory + " contains " + directoryCount + " subdirectories and " + filesCount + " files.");
+        System.out.println("directory " + directory + " contains " + directoryCount + " subdirectories and " + filesCount + " files.");
     }
 }

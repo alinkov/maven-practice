@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.hh.school</groupId>
-    <artifactId>count-files-maven-plugin</artifactId>
+    <artifactId>check-files-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>count-files-maven-plugin Maven Mojo</name>
+    <name>check-files-maven-plugin Maven Mojo</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -27,7 +27,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
-                        <!--<release>${jdk.version}</release>--><!--TODO uncomment this line, if you use Java9+ or delete-->
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
                     </configuration>
