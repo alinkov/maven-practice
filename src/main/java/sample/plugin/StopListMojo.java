@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -147,22 +148,10 @@ public class StopListMojo extends AbstractMojo {
    * @param file to check
    */
   private void checkFileName(File file) {
-    String fileName = file.getName();
-    if (ignoreCase) {
-      fileName = fileName.toLowerCase();
-    }
-
-    for (String stopWord : stopWords) {
-      if (ignoreCase) {
-        stopWord = stopWord.toLowerCase();
-      }
-      if (fileName.contains(stopWord)) {
-        String entityType = file.isDirectory() ? "Directory" : "File";
-        handleStopWordDetected(
-            String.format(
-                "%s name contains stop-word '%s', path: %s", entityType, stopWord, file.getPath()));
-      }
-    }
+    String entityType = file.isDirectory() ? "Directory" : "File";
+    String errorMessage =
+        String.format("%s name contains stop-word, path: %s", entityType, file.getPath());
+    checkStringForStopWords(file.getName(), errorMessage);
   }
 
   /**
@@ -221,15 +210,20 @@ public class StopListMojo extends AbstractMojo {
    * @param errorMessage - error message for log
    */
   private void checkStringForStopWords(String content, String errorMessage) {
-    for (String stopWord : stopWords) {
-      if (ignoreCase) {
-        stopWord = stopWord.toLowerCase();
-      }
+    stopWords.forEach(
+        stopWord -> {
+          boolean containsStopWord;
 
-      if (content.contains(stopWord)) {
-        handleStopWordDetected(errorMessage + ", stop word: " + stopWord);
-      }
-    }
+          if (ignoreCase) {
+            containsStopWord = StringUtils.containsIgnoreCase(content, stopWord);
+          } else {
+            containsStopWord = content.contains(stopWord);
+          }
+
+          if (containsStopWord) {
+            handleStopWordDetected(errorMessage + ", stop word: " + stopWord);
+          }
+        });
   }
 
   /**

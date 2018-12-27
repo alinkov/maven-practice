@@ -13,7 +13,7 @@ public class StopListMojoTest {
 
   @Test
   public void testPluginRun() throws Exception {
-    File pom = new File("src/test/resources/project-to-test/");
+    File pom = new File(getClass().getResource("/project-to-test").getFile());
     assertNotNull(pom);
     assertTrue(pom.exists());
     StopListMojo myMojo = (StopListMojo) rule.lookupConfiguredMojo(pom, "check");
