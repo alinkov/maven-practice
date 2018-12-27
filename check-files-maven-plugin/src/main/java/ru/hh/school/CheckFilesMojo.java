@@ -22,7 +22,7 @@ public class CheckFilesMojo extends AbstractMojo {
     /**
      * Number to compare with count files in directory
      */
-    @Parameter(property = "count", defaultValue = "20")
+    @Parameter(property = "count", defaultValue = "22")
     private int count;
 
     public void execute()
@@ -37,7 +37,7 @@ public class CheckFilesMojo extends AbstractMojo {
             getLog().info("                   That's less than " + count + " files.");
             getLog().info("------------------------------------------------------------------------");
             getLog().info("Detailing:");
-            getDetailing(path);
+            printDetailing(path);
         }
         getLog().info("------------------------------------------------------------------------");
     }
@@ -55,7 +55,7 @@ public class CheckFilesMojo extends AbstractMojo {
         return (filesCount);
     }
 
-    private void getDetailing(File directory) {
+    private void printDetailing(File directory) {
         int filesCount = 0;
         int directoryCount = 0;
         File[] listFiles = directory.listFiles();
@@ -65,9 +65,9 @@ public class CheckFilesMojo extends AbstractMojo {
                 filesCount++;
             } else {
                 directoryCount++;
-                getDetailing(subFile);
+                printDetailing(subFile);
             }
         }
-        System.out.println("directory " + directory + " contains " + directoryCount + " subdirectories and " + filesCount + " files.");
+        getLog().info(String.format("Directory %s contains %s subdirectories and %s files.", directory, directoryCount, filesCount));
     }
 }
