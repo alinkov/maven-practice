@@ -4,13 +4,12 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class VacancyDTO {
@@ -20,5 +19,6 @@ public class VacancyDTO {
     private Long salaryFrom;
     private Long salaryTo;
     private String description;
+    @EqualsAndHashCode.Exclude
     private List<SkillDTO> skills;
 }
