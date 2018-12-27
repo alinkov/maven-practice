@@ -8,6 +8,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
@@ -21,6 +22,10 @@ import java.util.stream.Collectors;
  *         Parameters:
  *         onlyJava (boolean) - if true, show only *.java files;
  *         maxAmount (int) - show not more than maxAmount recently changed files.
+ *
+ * @parameter maxAmount
+ * @param onlyJava
+ *
  *
  */
 
@@ -52,7 +57,7 @@ public class RecentlyChangesMojo extends AbstractMojo {
                 .get()
                 .lastModified();
 
-            RegexFileFilter fileFilter = onlyJava ? new RegexFileFilter(".*java") : new RegexFileFilter(".*");
+            SuffixFileFilter fileFilter = onlyJava ? new SuffixFileFilter(".java") : new SuffixFileFilter("");
             File src = new File(project.getBasedir(), "src");
             Collection<File> allFiles = FileUtils.listFiles(src, fileFilter, TrueFileFilter.INSTANCE);
             getLog().info("Total file amount: " + allFiles.size());

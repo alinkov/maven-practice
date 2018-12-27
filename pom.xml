@@ -18,6 +18,10 @@
         <jdk.version>8</jdk.version>
     </properties>
 
+    <modules>
+        <module>recenly-changes-maven-plugin</module>
+    </modules>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -42,7 +46,6 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
-                        <!--<release>${jdk.version}</release>--><!--TODO uncomment this line, if you use Java9+ or delete-->
                         <source>${jdk.version}</source>
                         <target>${jdk.version}</target>
                     </configuration>
