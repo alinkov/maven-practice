@@ -28,18 +28,18 @@ public class CheckFilesMojo extends AbstractMojo {
     public void execute()
             throws MojoExecutionException {
         int countFiles = getCount(new File(path));
-        System.out.println("-------------------------------------------------------------------------------");
-        System.out.println("              The required directory has " + countFiles + " files.");
+        getLog().info("------------------------------------------------------------------------");
+        getLog().info("              The required directory has " + countFiles + " files.");
         if (countFiles > Integer.parseInt(count)) {
-            System.out.println("                   That's more than " + count + " files.");
+            getLog().info("                   That's more than " + count + " files.");
         }
         else {
-            System.out.println("                   That's less than " + count + " files.");
-            System.out.println("-------------------------------------------------------------------------------");
-            System.out.println("Detailing:");
+            getLog().info("                   That's less than " + count + " files.");
+            getLog().info("------------------------------------------------------------------------");
+            getLog().info("Detailing:");
             getDetailing(new File(path));
         }
-        System.out.println("-------------------------------------------------------------------------------");
+        getLog().info("------------------------------------------------------------------------");
     }
     private int getCount(File directory) {
         int filesCount = 0;
