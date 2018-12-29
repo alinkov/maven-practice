@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /**
- * Goal which changes a greeted name.
+ * Scan project for fields in classes.
  */
 
 @Mojo(name = "setname", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true)
