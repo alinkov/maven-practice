@@ -42,7 +42,7 @@ public class CheckFilesMojo extends AbstractMojo {
             getCount(path, detailing);
             printResult(detailing);
         } else {
-            getLog().error("Directory " + path + " does not exists.");
+            getLog().warn("Directory " + path + " does not exists.");
         }
     }
 
@@ -55,7 +55,7 @@ public class CheckFilesMojo extends AbstractMojo {
         int filesCount = 0;
         int directoryCount = 0;
         if (!directory.canRead()) {
-            getLog().error("Directory " + directory + " cannot be read");
+            getLog().warn("Directory " + directory + " cannot be read");
             return;
         }
         File[] listFiles = directory.listFiles();
@@ -92,7 +92,7 @@ public class CheckFilesMojo extends AbstractMojo {
             for (String detail : detailing) {
                 getLog().info(detail);
             }
-            getLog().info("------------------------------------------------------------------------");
         }
+        getLog().info("------------------------------------------------------------------------");
     }
 }
