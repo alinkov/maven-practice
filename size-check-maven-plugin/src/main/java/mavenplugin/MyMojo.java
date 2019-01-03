@@ -22,29 +22,38 @@ public class MyMojo extends AbstractMojo {
      * Path to the top directory.
      */
     @Parameter(property = "path", defaultValue = "${basedir}")
-    private File dir;
+    private File path;
 
     /**
      * Threshold value of bytes to compare with file size in the directory.
      */
-    @Parameter(property = "count", defaultValue = "1024")
+    @Parameter(property = "theshold", defaultValue = "1024")
     private long theshold;
 
     /**
      * Recursive search to analyze files in directories.
      */
-    @Parameter(property = "count", defaultValue = "true")
+    @Parameter(property = "recursiveDescent", defaultValue = "true")
     private boolean recursiveDescent;
 
-    public void execute() throws MojoExecutionException {
-        searchLargeFiles(dir.listFiles());
+    public void execute(){
+        if (path.exists()) {
+            searchLargeFiles(path);
+        } else {
+            getLog().warn(String.format("Chosen directory: %s does not exists", path));
+        }
     }
 
-    void searchLargeFiles(File[] files) {
+    void searchLargeFiles(File dir) {
+        if (!dir.canRead()) {
+            getLog().warn(dir + " cannot be read");
+            return;
+        }
+        File[] files = dir.listFiles();
         Arrays.stream(files)
                 .map(file -> {
                     if (file.isDirectory() && recursiveDescent) {
-                        searchLargeFiles(file.listFiles());
+                        searchLargeFiles(file);
                     }
                     return file;
                 })

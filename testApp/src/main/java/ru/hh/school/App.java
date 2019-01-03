@@ -3,7 +3,7 @@ package ru.hh.school;
 
 
 /**
- * Hello world!
+ * Hello-world project to use size-check plugin.
  */
 public class App {
     public static void main(String[] args) {
