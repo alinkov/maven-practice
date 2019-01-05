@@ -1,7 +1,6 @@
-package mavenplugin;
+package ru.hh.school;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,8 +26,8 @@ public class MyMojo extends AbstractMojo {
     /**
      * Threshold value of bytes to compare with file size in the directory.
      */
-    @Parameter(property = "theshold", defaultValue = "1024")
-    private long theshold;
+    @Parameter(property = "threshold", defaultValue = "1024")
+    private long threshold;
 
     /**
      * Recursive search to analyze files in directories.
@@ -62,8 +61,8 @@ public class MyMojo extends AbstractMojo {
     }
 
     void check(File file) {
-        if (file.length() > theshold)
+        if (file.length() > threshold)
             getLog().warn(String.format("%s = %s bytes (more then %s bytes) ",
-                    file.getAbsolutePath(), file.length(), theshold));
+                    file.getAbsolutePath(), file.length(), threshold));
     }
 }
