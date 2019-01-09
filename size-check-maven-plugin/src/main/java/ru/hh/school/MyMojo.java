@@ -35,7 +35,7 @@ public class MyMojo extends AbstractMojo {
     @Parameter(property = "recursiveDescent", defaultValue = "true")
     private boolean recursiveDescent;
 
-    public void execute(){
+    public void execute() {
         if (path.exists()) {
             searchLargeFiles(path);
         } else {
@@ -49,15 +49,14 @@ public class MyMojo extends AbstractMojo {
             return;
         }
         File[] files = dir.listFiles();
-        Arrays.stream(files)
-                .map(file -> {
-                    if (file.isDirectory() && recursiveDescent) {
-                        searchLargeFiles(file);
-                    }
-                    return file;
-                })
-                .filter(p -> !p.isDirectory())
-                .forEach(this::check);
+
+        for (File file : files) {
+            if (file.isDirectory() && recursiveDescent) {
+                searchLargeFiles(file);
+            } else if (file.isFile()){
+                check(file);
+            }
+        }
     }
 
     void check(File file) {

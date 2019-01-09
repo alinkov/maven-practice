@@ -9,6 +9,10 @@
 
     <name>testApp</name>
 
+    <properties>
+        <jdk.version>8</jdk.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -50,9 +54,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <!-- specify current java version here: -->
-                    <source>9</source>
-                    <target>9</target> <!-- or edit these in your properties -->
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                 </configuration>
             </plugin>
         </plugins>
