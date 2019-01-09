@@ -86,7 +86,7 @@ public class CompressMojo extends AbstractMojo {
             parentDir.toFile().mkdirs();
         }
         String filename = targetFile.getFileName().toString();
-        filename = filename.substring(0, filename.lastIndexOf('.')) + extension;
+        filename = filename.lastIndexOf('.') == -1 ? filename + extension: filename.substring(0, filename.lastIndexOf('.')) + extension;
         Path tgtFile = parentDir.resolve(filename);
         try (ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(tgtFile.toFile()))) {
             byte[] bytes = Files.readAllBytes(srcPath.resolve(relative));
@@ -102,7 +102,7 @@ public class CompressMojo extends AbstractMojo {
             return true;
         }
         for (String pattern : includes) {
-            if (relative.toString().matches(pattern.replaceAll("\\*\\*", "*").replaceAll("\\*", ".*"))) {
+            if (relative.toString().matches(pattern.replaceAll("\\*+", "*"))) {
                 return true;
             }
         }
