@@ -19,20 +19,20 @@ import org.apache.maven.plugins.annotations.Parameter;
 @Mojo(name = "sort")
 public class DateControl extends AbstractMojo {
 
-  /**
+  /*
    * Absolute path of directory starting with "/"
    * or relative path inside of root project folder
    */
   @Parameter(property = "rootDir", defaultValue = "${basedir}")
   private File rootDir;
 
-  /**
+  /*
    * Sort ascending(true) or descending(false)
    */
   @Parameter(property = "sortAsc", defaultValue = "true")
   private boolean sortAsc;
 
-  /**
+  /*
    * Sort by creation date(true) or change date(false)
    */
   @Parameter(property = "mode", defaultValue = "true")
@@ -40,9 +40,15 @@ public class DateControl extends AbstractMojo {
 
   private List<String> filesArr = new ArrayList<String>();
 
+  @Override
   public void execute() throws MojoExecutionException {
     printParameters();
+    checkInput();
     fillFilesArr(rootDir);
+    if (filesArr.size() == 0) {
+      getLog().info("The directory " + rootDir + " is empty.");
+      return;
+    }
     Collections.sort(filesArr);
     if (!sortAsc) {
       Collections.reverse(filesArr);
@@ -52,20 +58,24 @@ public class DateControl extends AbstractMojo {
     }
   }
 
-  void fillFilesArr(File directory) {
+  void fillFilesArr(File directory) throws MojoExecutionException {
+    if (!directory.canRead()) {
+      String directiryInfo = filesArr.remove(filesArr.size() - 1);
+      filesArr.add(directiryInfo + " Access denied.");
+      return;
+    }
     for (File file : directory.listFiles()) {
       Path filePath = file.toPath();
       BasicFileAttributes attr = null;
       try {
         attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+        if (mode) {
+          filesArr.add(attr.creationTime().toString() + ' ' + filePath.toString());
+        } else {
+          filesArr.add(attr.lastModifiedTime().toString() + ' ' + filePath.toString());
+        }
       } catch (IOException exception) {
-        getLog().info("Exception handled when trying to get file "
-            + "attributes: " + exception.getMessage());
-      }
-      if (mode) {
-        filesArr.add(attr.creationTime().toString() + ' ' + filePath.toString());
-      } else {
-        filesArr.add(attr.lastModifiedTime().toString() + ' ' + filePath.toString());
+        throw new MojoExecutionException("Unable to read attributes of file: " + file);
       }
       if (file.isDirectory()) {
         fillFilesArr(file);
@@ -84,6 +94,15 @@ public class DateControl extends AbstractMojo {
       getLog().info("by creation date.");
     } else {
       getLog().info("by change date.");
+    }
+  }
+
+  void checkInput() throws MojoExecutionException {
+    if (!rootDir.isDirectory()) {
+      throw new MojoExecutionException(rootDir + " is not a directory.");
+    }
+    if (!rootDir.canRead()) {
+      throw new MojoExecutionException(rootDir + " Access denied");
     }
   }
 }
