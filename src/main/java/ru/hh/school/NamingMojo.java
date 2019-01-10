@@ -13,19 +13,21 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.Iterator;
 import java.util.Vector;
 
 /**
  * Scan project for fields in classes.
  */
 
-@Mojo(name = "setname", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true)
+@Mojo(
+        name = "setname",
+        defaultPhase = LifecyclePhase.PROCESS_CLASSES,
+        threadSafe = true
+)
 public class NamingMojo extends AbstractMojo {
+    /**
+     * Target group ID. Hidden parametr.
+     */
     @Parameter(defaultValue = "${project.groupId}.", readonly = true)
     private String groupTarget;
 
@@ -47,23 +49,32 @@ public class NamingMojo extends AbstractMojo {
     @Parameter(defaultValue = "Поле содержит: ", property = "message")
     private String message;
 
-    @Parameter( defaultValue = "${project}", readonly = true )
+    /**
+     * Project description.
+     */
+    @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
-    public void execute() throws MojoExecutionException {
+    /**
+     * Output Field of Class.
+     * @throws MojoExecutionException Can throw MojoExecutionException.
+     */
+    public final void execute() throws MojoExecutionException {
         getLog().info("Замена полей");
 
 
         ClassPool pool = ClassPool.getDefault();
         try {
             Vector<String> classList = new Vector<String>();
-            for( String cp : project.getCompileClasspathElements()) {
+            for (String cp : project.getCompileClasspathElements()) {
                 pool.insertClassPath(cp);
-                if (classTarget==null || classTarget.equals("")) {
-                    processFilesFromFolder(new File(cp),"", classList);
+                if (classTarget == null || classTarget.equals("")) {
+                    classList.copyInto(
+                            processFilesFromFolder(new File(cp), "")
+                    );
                 }
             }
-            if (classTarget!=null && classTarget.length()!=0) {
+            if (classTarget != null && classTarget.length() != 0) {
                 classList.add(groupTarget.concat(classTarget));
             }
             for (String className : classList) {
@@ -72,53 +83,84 @@ public class NamingMojo extends AbstractMojo {
                     if (fieldTarget == null || fieldTarget.equals("")) {
                         CtField[] fields = ct.getFields();
                         for (CtField field : fields) {
-                            getLog().info(String.format("%s %s#%s: %s", message, className, field.getName(), field.getConstantValue()));
+                            getLog().info(String.format(
+                                    "%s %s#%s: %s",
+                                    message,
+                                    className,
+                                    field.getName(),
+                                    field.getConstantValue()
+                            ));
                         }
                     } else {
                         try {
                             CtField field = ct.getField(fieldTarget);
-                            getLog().info(String.format("%s %s#%s: %s", message, className, fieldTarget, field.getConstantValue()));
-                        }
-                        catch (NotFoundException e) {
-                            if (classList.size()<2) {
+                            getLog().info(String.format(
+                                    "%s %s#%s: %s",
+                                    message,
+                                    className,
+                                    fieldTarget,
+                                    field.getConstantValue())
+                            );
+                        } catch (NotFoundException e) {
+                            if (classList.size() < 2) {
                                 getLog().error(e.getMessage());
-                                throw new MojoExecutionException(e.getMessage());
+                                throw new MojoExecutionException(
+                                        e.getMessage()
+                                );
                             }
                         }
                     }
-                }
-                catch (NotFoundException e) {
+                } catch (NotFoundException e) {
                     getLog().error(e.getMessage());
                     throw new MojoExecutionException(e.getMessage());
                 }
             }
-        } catch (NotFoundException | DependencyResolutionRequiredException e) {
+        } catch (NotFoundException e) {
+            getLog().error(e.getMessage());
+            throw new MojoExecutionException(e.getMessage());
+        } catch (DependencyResolutionRequiredException e) {
             getLog().error(e.getMessage());
             throw new MojoExecutionException(e.getMessage());
         }
     }
 
-    private void processFilesFromFolder(File folder, String packageName, Vector<String> classList)
-    {
+    /**
+     * Create list of classes in folder.
+     * @param folder Current folder.
+     * @param packageName Current package name.
+     * @return List of classes in current folder.
+     */
+    private Object[] processFilesFromFolder(
+            final File folder,
+            final String packageName
+    ) {
+        Vector<String> classList = new Vector<String>();
         File[] folderEntries = folder.listFiles();
-        for (File entry : folderEntries)
-        {
-            if (entry.isDirectory())
-            {
-                String newPackageName;
-                if (packageName==null || packageName.equals("")) {
-                    newPackageName = new String(entry.getName());
+        for (File entry : folderEntries) {
+            if (entry.isDirectory()) {
+                if (entry.canRead()) {
+                    String newPackageName;
+                    if (packageName == null || packageName.equals("")) {
+                        newPackageName = new String(entry.getName());
+                    } else {
+                        newPackageName = packageName.concat(".");
+                        newPackageName = newPackageName.concat(entry.getName());
+                    }
+                    classList.copyInto(
+                            processFilesFromFolder(entry, newPackageName)
+                    );
                 }
-                else {
-                    newPackageName = packageName.concat(".").concat(entry.getName());
-                }
-                processFilesFromFolder(entry, newPackageName, classList);
                 continue;
             }
             String fileName = entry.getName();
-            if (fileName.endsWith(".class")) {
-                classList.add(packageName.concat(".").concat(fileName.substring(0,fileName.length()-6)));
+            String filter = ".class";
+            if (fileName.endsWith(filter)) {
+                String className = packageName.concat(".");
+                int nameLen = fileName.length() - filter.length();
+                className = className.concat(fileName.substring(0, nameLen));
+                classList.add(className);
             }
         }
+        return classList.toArray();
     }
 }
