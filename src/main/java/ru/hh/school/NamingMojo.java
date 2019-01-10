@@ -62,14 +62,13 @@ public class NamingMojo extends AbstractMojo {
     public final void execute() throws MojoExecutionException {
         getLog().info("Замена полей");
 
-
         ClassPool pool = ClassPool.getDefault();
         try {
             Vector<String> classList = new Vector<String>();
             for (String cp : project.getCompileClasspathElements()) {
                 pool.insertClassPath(cp);
                 if (classTarget == null || classTarget.equals("")) {
-                    classList.copyInto(
+                    classList.addAll(
                             processFilesFromFolder(new File(cp), "")
                     );
                 }
@@ -130,7 +129,7 @@ public class NamingMojo extends AbstractMojo {
      * @param packageName Current package name.
      * @return List of classes in current folder.
      */
-    private Object[] processFilesFromFolder(
+    private Vector<String> processFilesFromFolder(
             final File folder,
             final String packageName
     ) {
@@ -146,7 +145,7 @@ public class NamingMojo extends AbstractMojo {
                         newPackageName = packageName.concat(".");
                         newPackageName = newPackageName.concat(entry.getName());
                     }
-                    classList.copyInto(
+                    classList.addAll(
                             processFilesFromFolder(entry, newPackageName)
                     );
                 }
@@ -161,6 +160,6 @@ public class NamingMojo extends AbstractMojo {
                 classList.add(className);
             }
         }
-        return classList.toArray();
+        return classList;
     }
 }
