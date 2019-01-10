@@ -1,21 +1,19 @@
-package main.java.com.electrodynamics;
+package com.electrodynamics;
+
+// вычисления по закону Ома для участка цепи
 
 public class OhmLaw {
 
-    double voltage;
-    double current_strength;
-    double resistance;
-
-    public OhmLaw(double u, double i, double r){
-        voltage = u;
-        current_strength = i;
-        resistance = r;
+    public double currentStrengthCalc(final double voltage, final double resistance) {
+        return voltage / resistance;
     }
 
-    public double current_strength_computation() {return voltage / resistance;}
+    public double voltageCalc(final double currentStrength, final double resistance) {
+        return currentStrength * resistance;
+    }
 
-    public double voltage_computation() {return current_strength * resistance;}
-
-    public double resistance_computation() {return voltage / current_strength;}
+    public double resistanceCalc(final double voltage, final double currentStrength) {
+        return voltage / currentStrength;
+    }
 
 }
