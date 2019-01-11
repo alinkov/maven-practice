@@ -1,14 +1,12 @@
 package ru.hh.school;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -16,28 +14,35 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
+/**
+ * This plugin sorts files and dirictories by date.
+ *  @author AleksandrFursov
+ */
 @Mojo(name = "sort")
-public class DateControl extends AbstractMojo {
+final class DateControl extends AbstractMojo {
 
-  /*
+  /**
    * Absolute path of directory starting with "/"
-   * or relative path inside of root project folder
+   * or relative path inside of root project folder.
    */
   @Parameter(property = "rootDir", defaultValue = "${basedir}")
   private File rootDir;
 
-  /*
-   * Sort ascending(true) or descending(false)
+  /**
+   * Sort ascending(true) or descending(false).
    */
   @Parameter(property = "sortAsc", defaultValue = "true")
   private boolean sortAsc;
 
-  /*
-   * Sort by creation date(true) or change date(false)
+  /**
+   * Sort by creation date(true) or change date(false).
    */
   @Parameter(property = "mode", defaultValue = "true")
   private boolean mode;
 
+  /**
+   * List for saving attributes of files.
+   */
   private List<String> filesArr = new ArrayList<String>();
 
   @Override
@@ -58,7 +63,14 @@ public class DateControl extends AbstractMojo {
     }
   }
 
-  void fillFilesArr(File directory) throws MojoExecutionException {
+  /**
+   * Recursive function for getting attributes
+   * of each file and directory of root directory.
+   * @param directory - path to the calculating directory
+   * @throws MojoExecutionException - MojoExecutionException
+   */
+  private void fillFilesArr(final File directory)
+      throws MojoExecutionException {
     if (!directory.canRead()) {
       String directiryInfo = filesArr.remove(filesArr.size() - 1);
       filesArr.add(directiryInfo + " Access denied.");
@@ -70,12 +82,15 @@ public class DateControl extends AbstractMojo {
       try {
         attr = Files.readAttributes(filePath, BasicFileAttributes.class);
         if (mode) {
-          filesArr.add(attr.creationTime().toString() + ' ' + filePath.toString());
+          filesArr.add(attr.creationTime().toString()
+              + ' ' + filePath.toString());
         } else {
-          filesArr.add(attr.lastModifiedTime().toString() + ' ' + filePath.toString());
+          filesArr.add(attr.lastModifiedTime().toString()
+              + ' ' + filePath.toString());
         }
       } catch (IOException exception) {
-        throw new MojoExecutionException("Unable to read attributes of file: " + file);
+        throw new MojoExecutionException("Unable to read attributes of file: "
+            + file);
       }
       if (file.isDirectory()) {
         fillFilesArr(file);
@@ -83,7 +98,10 @@ public class DateControl extends AbstractMojo {
     }
   }
 
-  void printParameters() {
+  /**
+   * Prints values of all parameters of the plugin.
+   */
+  private void printParameters() {
     getLog().info("Serach in directory: " + rootDir);
     if (sortAsc) {
       getLog().info("Sort ascending");
@@ -97,7 +115,11 @@ public class DateControl extends AbstractMojo {
     }
   }
 
-  void checkInput() throws MojoExecutionException {
+  /**
+   * Validate input.
+   * @throws MojoExecutionException - MojoExecutionException
+   */
+  private void checkInput() throws MojoExecutionException {
     if (!rootDir.isDirectory()) {
       throw new MojoExecutionException(rootDir + " is not a directory.");
     }
