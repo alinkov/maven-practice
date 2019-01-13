@@ -13,7 +13,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.LinkedList;
 
 /**
  * Scan project for fields in classes.
@@ -57,6 +57,7 @@ public class NamingMojo extends AbstractMojo {
 
     /**
      * Output Field of Class.
+     *
      * @throws MojoExecutionException Can throw MojoExecutionException.
      */
     public final void execute() throws MojoExecutionException {
@@ -64,7 +65,7 @@ public class NamingMojo extends AbstractMojo {
 
         ClassPool pool = ClassPool.getDefault();
         try {
-            Vector<String> classList = new Vector<String>();
+            LinkedList<String> classList = new LinkedList<String>();
             for (String cp : project.getCompileClasspathElements()) {
                 pool.insertClassPath(cp);
                 if (classTarget == null || classTarget.equals("")) {
@@ -77,41 +78,11 @@ public class NamingMojo extends AbstractMojo {
                 classList.add(groupTarget.concat(classTarget));
             }
             for (String className : classList) {
-                try {
-                    CtClass ct = pool.get(className);
-                    if (fieldTarget == null || fieldTarget.equals("")) {
-                        CtField[] fields = ct.getFields();
-                        for (CtField field : fields) {
-                            getLog().info(String.format(
-                                    "%s %s#%s: %s",
-                                    message,
-                                    className,
-                                    field.getName(),
-                                    field.getConstantValue()
-                            ));
-                        }
-                    } else {
-                        try {
-                            CtField field = ct.getField(fieldTarget);
-                            getLog().info(String.format(
-                                    "%s %s#%s: %s",
-                                    message,
-                                    className,
-                                    fieldTarget,
-                                    field.getConstantValue())
-                            );
-                        } catch (NotFoundException e) {
-                            if (classList.size() < 2) {
-                                getLog().error(e.getMessage());
-                                throw new MojoExecutionException(
-                                        e.getMessage()
-                                );
-                            }
-                        }
-                    }
-                } catch (NotFoundException e) {
-                    getLog().error(e.getMessage());
-                    throw new MojoExecutionException(e.getMessage());
+                CtClass ct = pool.get(className);
+                if (classList.size() < 2) {
+                    showNeedFields(ct, true);
+                } else {
+                    showNeedFields(ct, false);
                 }
             }
         } catch (NotFoundException e) {
@@ -124,23 +95,64 @@ public class NamingMojo extends AbstractMojo {
     }
 
     /**
+     * Вывод значение поля fieldTarget.
+     * При пустом fieldTarget вывод всех полей класса.
+     *
+     * @param ct        Класс, в котором необходимо искать поле.
+     * @param needError В случае отсутствия поля выдавать/не выдавать ошибку.
+     * @throws MojoExecutionException Ошибка отсутствия поля.
+     */
+    private void showNeedFields(final CtClass ct, final boolean needError)
+            throws MojoExecutionException {
+        if (fieldTarget == null || fieldTarget.equals("")) {
+            CtField[] fields = ct.getFields();
+            for (CtField field : fields) {
+                getLog().info(String.format(
+                        "%s %s#%s: %s",
+                        message,
+                        ct.getName(),
+                        field.getName(),
+                        field.getConstantValue()
+                ));
+            }
+        } else {
+            try {
+                CtField field = ct.getField(fieldTarget);
+                getLog().info(String.format(
+                        "%s %s#%s: %s",
+                        message,
+                        ct.getName(),
+                        fieldTarget,
+                        field.getConstantValue())
+                );
+            } catch (NotFoundException e) {
+                if (needError) {
+                    getLog().error(e.getMessage());
+                    throw new MojoExecutionException(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
      * Create list of classes in folder.
-     * @param folder Current folder.
+     *
+     * @param folder      Current folder.
      * @param packageName Current package name.
      * @return List of classes in current folder.
      */
-    private Vector<String> processFilesFromFolder(
+    private LinkedList<String> processFilesFromFolder(
             final File folder,
             final String packageName
     ) {
-        Vector<String> classList = new Vector<String>();
+        LinkedList<String> classList = new LinkedList<String>();
         File[] folderEntries = folder.listFiles();
         for (File entry : folderEntries) {
             if (entry.isDirectory()) {
                 if (entry.canRead()) {
                     String newPackageName;
                     if (packageName == null || packageName.equals("")) {
-                        newPackageName = new String(entry.getName());
+                        newPackageName = entry.getName();
                     } else {
                         newPackageName = packageName.concat(".");
                         newPackageName = newPackageName.concat(entry.getName());
@@ -154,7 +166,12 @@ public class NamingMojo extends AbstractMojo {
             String fileName = entry.getName();
             String filter = ".class";
             if (fileName.endsWith(filter)) {
-                String className = packageName.concat(".");
+                String className;
+                if (packageName != null && !packageName.equals("")) {
+                    className = packageName.concat(".");
+                } else {
+                    className = "";
+                }
                 int nameLen = fileName.length() - filter.length();
                 className = className.concat(fileName.substring(0, nameLen));
                 classList.add(className);
